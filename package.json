@@ -1,0 +1,20 @@
+{
+  "name": "vanillapinch",
+  "version": "1.0.0",
+  "description": "A native version of RTP Pinch Zoom",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "vanilla",
+    "pinch",
+    "zoom",
+    "pinchzoom"
+  ],
+  "author": "Jordan gensler <jordangens@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "object-assign": "^2.0.0"
+  }
+}
