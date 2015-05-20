@@ -2,18 +2,17 @@
 
 VanillaPinch is a fork of PinchZoom.js with no jQuery dependency. The library provides multi touch gestures for zooming and dragging on any DOM element.
 
-This uses a CommonJS, and is designed for use with Browserify.
+Finally, you are free of the shackles of jQuery! All you need is a [modern browser](http://caniuse.com/use-strict).
 
 ## Usage
 
-### Requirements
-* ECMAScript 5 support (http://caniuse.com/use-strict).
-
-### 
+The library exports a CommonJS module, and is designed for use with Browserify. For your conveience, a built version of VanillaPinch is included in `dist/`, which is a standalone Browserify bundle that assigns `VanillaPinch` on the global object.
 
 ```Javascript
 
-new PinchZoom($('#your-element'), options);
+var VanillaPinch = require('vanillapinch');
+
+var myVanillaPinch = new VanillaPinch(document.querySelector('#your-element'), options);
 
 ```
 
@@ -52,11 +51,3 @@ enable:             Enables all gesture capturing (default)
 disable:            Disables all gesture capturing
 
 ```
-
-## Licence
-
-PinchZoom is licensed under the [MIT License](http://opensource.org/licenses/MIT).
-
-## Github Page with demo
-
-http://rtp-ch.github.com/pinchzoom/

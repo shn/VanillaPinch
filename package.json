@@ -7,7 +7,8 @@
     "build": "npm run browserify && npm run min",
     "browserify": "browserify src/index.js --standalone VanillaPinch > dist/vanillapinch.js",
     "min": "uglifyjs dist/vanillapinch.js > dist/vanillapinch.min.js",
-    "test": "echo \"Maybe there will be tests one day...\" && exit 0"
+    "test": "echo \"Maybe there will be tests one day...\" && exit 0",
+    "prepublish": "npm run build"
   },
   "keywords": [
     "vanilla",
