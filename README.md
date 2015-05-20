@@ -1,6 +1,6 @@
-# PinchZoom.js
+# VanillaPinch
 
-PinchZoom.js is a Javascript library providing multi touch gestures for zooming and dragging on any DOM element.
+VanillaPinch is a fork of PinchZoom.js with no jQuery dependency. Javascript library providing multi touch gestures for zooming and dragging on any DOM element.
 
 ## Usage
 

@@ -1,27 +1,3 @@
-/*
-
-    Copyright (c) Manuel Stofer 2013 - rtp.ch - RTP.PinchZoom.js
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
-
-    The above copyright notice and this permission notice shall be included in
-    all copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-    THE SOFTWARE.
-
-*/
-
 var assign = require('object-assign');
 
 function createEvent(name, data) {
@@ -49,7 +25,147 @@ function isCloseTo(value, expected) {
   return value > expected - 0.01 && value < expected + 0.01;
 }
 
-module.exports = function PinchZoom(el, options) {
+function detectGestures(el, target) {
+  var interaction = null,
+    fingers = 0,
+    lastTouchStart = null,
+    startTouches = null;
+
+  function setInteraction(newInteraction, event) {
+        if (interaction !== newInteraction) {
+
+            if (interaction && !newInteraction) {
+                switch (interaction) {
+                    case "zoom":
+                        target.handleZoomEnd(event);
+                        break;
+                    case 'drag':
+                        target.handleDragEnd(event);
+                        break;
+                }
+            }
+
+            switch (newInteraction) {
+                case 'zoom':
+                    target.handleZoomStart(event);
+                    break;
+                case 'drag':
+                    target.handleDragStart(event);
+                    break;
+            }
+        }
+        interaction = newInteraction;
+    }
+
+    function updateInteraction(event) {
+        if (fingers === 2) {
+            setInteraction('zoom');
+        } else if (fingers === 1 && target.canDrag()) {
+            setInteraction('drag', event);
+        } else {
+            setInteraction(null, event);
+        }
+    }
+
+    function targetTouches(touches) {
+          return Array.prototype.slice.call(touches).map(function (touch) {
+              return {
+                  x: touch.pageX,
+                  y: touch.pageY
+              };
+          });
+      }
+
+      function getDistance(a, b) {
+          var x, y;
+          x = a.x - b.x;
+          y = a.y - b.y;
+          return Math.sqrt(x * x + y * y);
+      }
+
+      function calculateScale(startTouches, endTouches) {
+          var startDistance = getDistance(startTouches[0], startTouches[1]),
+              endDistance = getDistance(endTouches[0], endTouches[1]);
+          return endDistance / startDistance;
+      }
+
+      function cancelEvent(event) {
+          event.stopPropagation();
+          event.preventDefault();
+      }
+
+      function detectDoubleTap(event) {
+          var time = (new Date()).getTime();
+
+          if (fingers > 1) {
+              lastTouchStart = null;
+          }
+
+          if (time - lastTouchStart < 300) {
+              cancelEvent(event);
+
+              target.handleDoubleTap(event);
+              switch (interaction) {
+                  case "zoom":
+                      target.handleZoomEnd(event);
+                      break;
+                  case 'drag':
+                      target.handleDragEnd(event);
+                      break;
+              }
+          }
+
+          if (fingers === 1) {
+              lastTouchStart = time;
+          }
+      }
+
+      var firstMove = true;
+
+  el.addEventListener('touchstart', function (event) {
+      if(target.enabled) {
+          firstMove = true;
+          fingers = event.touches.length;
+          detectDoubleTap(event);
+      }
+  });
+
+  el.addEventListener('touchmove', function (event) {
+      if(target.enabled) {
+          if (firstMove) {
+              updateInteraction(event);
+              if (interaction) {
+                  cancelEvent(event);
+              }
+              startTouches = targetTouches(event.touches);
+          } else {
+              switch (interaction) {
+                  case 'zoom':
+                      target.handleZoom(event, calculateScale(startTouches, targetTouches(event.touches)));
+                      break;
+                  case 'drag':
+                      target.handleDrag(event);
+                      break;
+              }
+              if (interaction) {
+                  cancelEvent(event);
+                  target.update();
+              }
+          }
+
+          firstMove = false;
+      }
+  });
+
+  el.addEventListener('touchend', function (event) {
+      if(target.enabled) {
+          fingers = event.touches.length;
+          updateInteraction(event);
+      }
+  });
+};
+
+module.exports = function VanillaPinch(el, options) {
   this.el = el;
   this.zoomFactor = 1;
   this.lastScale = 1;
@@ -617,144 +733,4 @@ PinchZoom.prototype = {
   disable: function() {
     this.enabled = false;
   }
-};
-
-var detectGestures = function (el, target) {
-  var interaction = null,
-    fingers = 0,
-    lastTouchStart = null,
-    startTouches = null;
-
-  function setInteraction(newInteraction, event) {
-        if (interaction !== newInteraction) {
-
-            if (interaction && !newInteraction) {
-                switch (interaction) {
-                    case "zoom":
-                        target.handleZoomEnd(event);
-                        break;
-                    case 'drag':
-                        target.handleDragEnd(event);
-                        break;
-                }
-            }
-
-            switch (newInteraction) {
-                case 'zoom':
-                    target.handleZoomStart(event);
-                    break;
-                case 'drag':
-                    target.handleDragStart(event);
-                    break;
-            }
-        }
-        interaction = newInteraction;
-    }
-
-    function updateInteraction(event) {
-        if (fingers === 2) {
-            setInteraction('zoom');
-        } else if (fingers === 1 && target.canDrag()) {
-            setInteraction('drag', event);
-        } else {
-            setInteraction(null, event);
-        }
-    }
-
-    function targetTouches(touches) {
-          return Array.prototype.slice.call(touches).map(function (touch) {
-              return {
-                  x: touch.pageX,
-                  y: touch.pageY
-              };
-          });
-      }
-
-      function getDistance(a, b) {
-          var x, y;
-          x = a.x - b.x;
-          y = a.y - b.y;
-          return Math.sqrt(x * x + y * y);
-      }
-
-      function calculateScale(startTouches, endTouches) {
-          var startDistance = getDistance(startTouches[0], startTouches[1]),
-              endDistance = getDistance(endTouches[0], endTouches[1]);
-          return endDistance / startDistance;
-      }
-
-      function cancelEvent(event) {
-          event.stopPropagation();
-          event.preventDefault();
-      }
-
-      function detectDoubleTap(event) {
-          var time = (new Date()).getTime();
-
-          if (fingers > 1) {
-              lastTouchStart = null;
-          }
-
-          if (time - lastTouchStart < 300) {
-              cancelEvent(event);
-
-              target.handleDoubleTap(event);
-              switch (interaction) {
-                  case "zoom":
-                      target.handleZoomEnd(event);
-                      break;
-                  case 'drag':
-                      target.handleDragEnd(event);
-                      break;
-              }
-          }
-
-          if (fingers === 1) {
-              lastTouchStart = time;
-          }
-      }
-
-      var firstMove = true;
-
-  el.addEventListener('touchstart', function (event) {
-      if(target.enabled) {
-          firstMove = true;
-          fingers = event.touches.length;
-          detectDoubleTap(event);
-      }
-  });
-
-  el.addEventListener('touchmove', function (event) {
-      if(target.enabled) {
-          if (firstMove) {
-              updateInteraction(event);
-              if (interaction) {
-                  cancelEvent(event);
-              }
-              startTouches = targetTouches(event.touches);
-          } else {
-              switch (interaction) {
-                  case 'zoom':
-                      target.handleZoom(event, calculateScale(startTouches, targetTouches(event.touches)));
-                      break;
-                  case 'drag':
-                      target.handleDrag(event);
-                      break;
-              }
-              if (interaction) {
-                  cancelEvent(event);
-                  target.update();
-              }
-          }
-
-          firstMove = false;
-      }
-  });
-
-  el.addEventListener('touchend', function (event) {
-      if(target.enabled) {
-          fingers = event.touches.length;
-          updateInteraction(event);
-      }
-  });
 };
