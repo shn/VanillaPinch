@@ -1,11 +1,12 @@
 {
   "name": "vanillapinch",
   "version": "1.0.0",
-  "description": "A native version of RTP Pinch Zoom",
-  "main": "index.js",
+  "description": "A fork of RTP Pinch Zoom free from jQuery.",
+  "main": "src/index.js",
   "scripts": {
-    "build": "browserify ./index.js --standalone VanillaPinch > dist/vanillapinch.js",
-    "min": "build && uglifyjs dist/vanillapinch.js > dist/vanillapinch.min.js",
+    "build": "npm run browserify && npm run min",
+    "browserify": "browserify src/index.js --standalone VanillaPinch > dist/vanillapinch.js",
+    "min": "uglifyjs dist/vanillapinch.js > dist/vanillapinch.min.js",
     "test": "echo \"Maybe there will be tests one day...\" && exit 0"
   },
   "keywords": [
@@ -18,5 +19,9 @@
   "license": "MIT",
   "dependencies": {
     "object-assign": "^2.0.0"
+  },
+  "devDependencies": {
+    "browserify": "^10.2.1",
+    "uglify-js": "^2.4.22"
   }
 }

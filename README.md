@@ -1,14 +1,15 @@
 # VanillaPinch
 
-VanillaPinch is a fork of PinchZoom.js with no jQuery dependency. Javascript library providing multi touch gestures for zooming and dragging on any DOM element.
+VanillaPinch is a fork of PinchZoom.js with no jQuery dependency. The library provides multi touch gestures for zooming and dragging on any DOM element.
+
+This uses a CommonJS, and is designed for use with Browserify.
 
 ## Usage
 
 ### Requirements
-* jQuery or Zepto.
-* ECMA 5 support (http://caniuse.com/use-strict).
+* ECMAScript 5 support (http://caniuse.com/use-strict).
 
-### Initialisation
+### 
 
 ```Javascript
 

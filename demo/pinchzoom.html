@@ -16,16 +16,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes" />
 
-    <!-- pinchzoom requires: jquery -->
-    <script type="text/javascript" src="../dependencies/jquery-1.7.2.min.js"></script>
-    <script type="text/javascript" src="../src/pinchzoom.js"></script>
-    <script type="text/javascript">
-        $(function () {
-            $('div.pinch-zoom').each(function () {
-                new RTP.PinchZoom($(this), {});
-            });
-        })
-    </script>
+    <!-- pinchzoom requires: nothing! -->
+    <script type="text/javascript" src="../dist/vanillapinch.min.js"></script>
 </head>
 <body>
 
@@ -41,6 +33,10 @@
             <a class="image" href="http://www.flickr.com/photos/59446027@N00/5258583198" target="_blank">by Peter Nijenhuis on Flickr; Some rights reserved</a>
         </div>
     </div>
+
+    <script type="text/javascript">
+        new VanillaPinch(document.querySelector('.pinch-zoom'));
+    </script>
 
 </body>
 </html>
