@@ -3,7 +3,7 @@ var assign = require('object-assign');
 function createEvent(name, data) {
   data = data || {};
   if (window.CustomEvent) {
-    var event = new CustomEvent(name, {detail: data});
+    var event = new CustomEvent(name, {bubbles: true, detail: data});
   } else {
     var event = document.createEvent('CustomEvent');
     event.initCustomEvent(name, true, true, data);
